@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SUBE NFC Connect - Lectura, Acreditación & Diagnóstico NFC</title>
+  <meta name="description" content="Aplicación Android para lectura de saldo, acreditación de cargas, gráfico de gastos e historial de tarjetas SUBE con soporte Puente J7 y Modo OLED Negro." />
+  
+  <!-- Google Fonts & Tailwind CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            subeBlue: '#00A3E0',
+            subeDarkBlue: '#005580',
+            subeMint: '#00E676',
+            oledBlack: '#06080F',
+            cardBg: 'rgba(20, 26, 43, 0.75)',
+          },
+          animation: {
+            'pulse-glow': 'pulseGlow 2.5s infinite ease-in-out',
+            'float': 'float 4s infinite ease-in-out',
+            'scan-line': 'scanLine 2s infinite linear',
+          },
+          keyframes: {
+            pulseGlow: {
+              '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+              '50%': { opacity: '0.9', transform: 'scale(1.08)' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-10px)' },
+            },
+            scanLine: {
+              '0%': { top: '0%' },
+              '100%': { top: '100%' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    body {
+      background-color: #06080F;
+      color: #E2E8F0;
+    }
+    .glass-card {
+      background: rgba(18, 24, 40, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card-hover {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card-hover:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0, 163, 224, 0.4);
+      box-shadow: 0 12px 30px -10px rgba(0, 163, 224, 0.25);
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #00A3E0 0%, #00E676 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .gradient-border {
+      position: relative;
+    }
+    .gradient-border::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(0,163,224,0.5), rgba(0,230,118,0.2), transparent);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen font-sans selection:bg-subeBlue selection:text-white antialiased overflow-x-hidden">
+
+  <!-- Background Decorative Ambient Glows -->
+  <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-subeBlue/15 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+  <div class="fixed bottom-10 right-10 w-[450px] h-[450px] bg-subeMint/10 rounded-full blur-[140px] pointer-events-none -z-10"></div>
+
+  <!-- Header / Navigation -->
+  <header class="sticky top-0 z-50 backdrop-blur-md bg-oledBlack/80 border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-subeBlue to-subeMint flex items-center justify-center shadow-lg shadow-subeBlue/20">
+          <i class="fa-solid fa-nfc-symbol text-oledBlack font-bold text-xl"></i>
+        </div>
+        <div>
+          <span class="text-xl font-extrabold tracking-tight text-white">SUBE <span class="gradient-text">NFC Connect</span></span>
+          <span class="block text-[10px] text-gray-400 font-medium tracking-wider uppercase">Android App Native</span>
+        </div>
+      </div>
+
+      <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-300">
+        <a href="#features" class="hover:text-subeBlue transition-colors">Funcionalidades</a>
+        <a href="#preview" class="hover:text-subeBlue transition-colors">Vista Previa</a>
+        <a href="#oled" class="hover:text-subeBlue transition-colors">Modo OLED</a>
+        <a href="#diagnostics" class="hover:text-subeBlue transition-colors">Puente J7</a>
+      </nav>
+
+      <div class="flex items-center space-x-4">
+        <a href="https://github.com/Lucas18062025/Sube-NFC-Connect" target="_blank" rel="noopener noreferrer" class="glass-card px-4 py-2 rounded-lg text-sm font-semibold text-gray-200 hover:text-white flex items-center gap-2 hover:bg-white/10 transition-all">
+          <i class="fa-brands fa-github text-lg"></i>
+          <span class="hidden sm:inline">Ver Código</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative pt-12 pb-20 md:pt-20 md:pb-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      
+      <!-- Left Column: Copy -->
+      <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-subeBlue/10 text-subeBlue border border-subeBlue/20 backdrop-blur-sm">
+          <span class="w-2 h-2 rounded-full bg-subeMint animate-pulse"></span>
+          Compatible con Android 7.0 a 14+ & Puente J7
+        </div>
+        
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15]">
+          Lectura, Carga & Acreditación <span class="gradient-text">SUBE NFC</span> al instante
+        </h1>
+        
+        <p class="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed">
+          Consulta tu saldo, acredita cargas pendientes, transfiere saldo entre tarjetas y visualiza estadísticas con gráfico mensual interactivo. Optimizado para ahorro de batería OLED y teléfonos antiguos.
+        </p>
+
+        <!-- CTA Action Buttons -->
+        <div class="pt-4 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+          <a href="#preview" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-subeBlue to-subeDarkBlue text-white font-bold text-center shadow-lg shadow-subeBlue/30 hover:shadow-subeBlue/50 hover:scale-[1.02] transition-all flex items-center justify-center gap-3">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+            Explorar Aplicación
+          </a>
+          <a href="#features" class="w-full sm:w-auto px-7 py-4 rounded-xl glass-card text-gray-200 font-semibold text-center hover:bg-white/10 transition-all flex items-center justify-center gap-2">
+            <i class="fa-solid fa-layer-group text-subeMint"></i>
+            Ver Características
+          </a>
+        </div>
+
+        <!-- Metric Badges -->
+        <div class="pt-8 border-t border-white/10 grid grid-cols-3 gap-4 max-w-lg mx-auto lg:mx-0">
+          <div>
+            <span class="block text-2xl sm:text-3xl font-extrabold text-white">ISO 14443</span>
+            <span class="text-xs text-gray-400">Estándar APDU NFC</span>
+          </div>
+          <div>
+            <span class="block text-2xl sm:text-3xl font-extrabold text-subeMint">0% OLED</span>
+            <span class="text-xs text-gray-400">Modo Píxeles Negros</span>
+          </div>
+          <div>
+            <span class="block text-2xl sm:text-3xl font-extrabold text-subeBlue">Room DB</span>
+            <span class="text-xs text-gray-400">Historial Seguro</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Interactive Graphic Card Mockup -->
+      <div class="lg:col-span-5 flex justify-center">
+        <div class="relative w-full max-w-sm">
+          
+          <!-- Glowing background radar -->
+          <div class="absolute -inset-4 rounded-3xl bg-gradient-to-r from-subeBlue/30 to-subeMint/20 blur-2xl animate-pulse-glow"></div>
+          
+          <!-- Mock Phone Canvas -->
+          <div class="relative glass-card gradient-border rounded-[32px] p-5 shadow-2xl overflow-hidden bg-oledBlack/90">
+            <!-- Header bar -->
+            <div class="flex items-center justify-between pb-4 border-b border-white/10">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-subeBlue/20 flex items-center justify-center text-subeBlue">
+                  <i class="fa-solid fa-nfc-directional text-xs"></i>
+                </div>
+                <span class="text-xs font-bold text-white">Lector SUBE NFC</span>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-subeMint/20 text-subeMint">LISTO</span>
+            </div>
+
+            <!-- Virtual Card Visualizer -->
+            <div class="my-6 p-5 rounded-2xl bg-gradient-to-br from-subeBlue to-subeDarkBlue text-white shadow-xl animate-float relative overflow-hidden">
+              <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+              <div class="flex justify-between items-start mb-6">
+                <div>
+                  <span class="text-[10px] font-semibold tracking-wider uppercase opacity-80">Tarjeta SUBE</span>
+                  <div class="text-xs font-mono font-bold tracking-widest mt-1">6061 2849 9012 3411</div>
+                </div>
+                <i class="fa-solid fa-wifi rotate-90 text-lg opacity-90"></i>
+              </div>
+              <div class="flex justify-between items-end">
+                <div>
+                  <span class="text-[10px] opacity-75 block">Saldo Disponible</span>
+                  <span class="text-2xl font-extrabold">$ 4.350,00</span>
+                </div>
+                <span class="px-2 py-1 rounded bg-white/20 text-[10px] font-bold backdrop-blur-md">ACTIVA</span>
+              </div>
+            </div>
+
+            <!-- Scan Action Simulator -->
+            <div class="p-4 rounded-xl bg-white/5 border border-white/10 text-center space-y-3">
+              <div class="flex items-center justify-center space-x-2 text-subeMint text-xs font-semibold">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>¡Carga de $1500.0 acreditada!</span>
+              </div>
+              <button class="w-full py-2.5 rounded-lg bg-subeBlue hover:bg-subeBlue/90 text-white font-bold text-xs tracking-wide transition-colors">
+                <i class="fa-solid fa-nfc-symbol mr-1.5"></i> APOYAR TARJETA SUBE
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Features Grid -->
+  <section id="features" class="py-20 border-t border-white/5 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+      <h2 class="text-xs font-bold uppercase tracking-widest text-subeBlue">Funcionalidades Avanzadas</h2>
+      <p class="text-3xl sm:text-4xl font-extrabold text-white">Diseñado para la máxima eficiencia en movilidad</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      
+      <!-- Feature 1 -->
+      <div class="glass-card glass-card-hover p-8 rounded-2xl space-y-4">
+        <div class="w-12 h-12 rounded-xl bg-subeBlue/20 text-subeBlue flex items-center justify-center text-xl">
+          <i class="fa-solid fa-nfc-symbol"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white">Lector NFC & Acreditación APDU</h3>
+        <p class="text-sm text-gray-400 leading-relaxed">
+          Lee el UID de la tarjeta, consulta saldo al instante y acredita cargas pendientes compradas por MP, bancos o PagoMisCuentas.
+        </p>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="glass-card glass-card-hover p-8 rounded-2xl space-y-4">
+        <div class="w-12 h-12 rounded-xl bg-subeMint/20 text-subeMint flex items-center justify-center text-xl">
+          <i class="fa-solid fa-chart-line"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white">Gráfico de Gastos Mensuales</h3>
+        <p class="text-sm text-gray-400 leading-relaxed">
+          Gráfico interactivo nativo en Jetpack Compose que compara viajes vs. cargas mensuales y calcula tus ahorros con RED SUBE.
+        </p>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="glass-card glass-card-hover p-8 rounded-2xl space-y-4">
+        <div class="w-12 h-12 rounded-xl bg-yellow-500/20 text-yellow-400 flex items-center justify-center text-xl">
+          <i class="fa-solid fa-battery-three-quarters"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white">Modo OLED Negro (Ahorro Batería)</h3>
+        <p class="text-sm text-gray-400 leading-relaxed">
+          Tema en negro puro (#000000) que apaga los píxeles de pantallas AMOLED/OLED reduciendo el consumo a prácticamente cero.
+        </p>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="glass-card glass-card-hover p-8 rounded-2xl space-y-4">
+        <div class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl">
+          <i class="fa-solid fa-mobile-retro"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white">Puente J7 & Móviles Antiguos</h3>
+        <p class="text-sm text-gray-400 leading-relaxed">
+          Adaptador Soft-NFC que permite emular y procesar comandos de radiofrecuencia en dispositivos con chip NFC limitado.
+        </p>
+      </div>
+
+      <!-- Feature 5 -->
+      <div class="glass-card glass-card-hover p-8 rounded-2xl space-y-4">
+        <div class="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-xl">
+          <i class="fa-solid fa-arrow-right-arrow-left"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white">Transferencia de Saldo</h3>
+        <p class="text-sm text-gray-400 leading-relaxed">
+          Transfiere tu saldo acumulado entre tarjetas registradas de forma rápida, segura y verificada por biometría.
+        </p>
+      </div>
+
+      <!-- Feature 6 -->
+      <div class="glass-card glass-card-hover p-8 rounded-2xl space-y-4">
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl">
+          <i class="fa-solid fa-fingerprint"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white">Seguridad y Biometría</h3>
+        <p class="text-sm text-gray-400 leading-relaxed">
+          Base de datos local Room protegida por huella dactilar/PIN y opción para ocultar saldos en pantalla principal.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- App Screenshots / Preview Gallery -->
+  <section id="preview" class="py-20 bg-black/40 border-t border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-12 space-y-3">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-subeMint">Capturas de Pantalla</h2>
+        <p class="text-3xl font-extrabold text-white">Interfaz UI en Jetpack Compose</p>
+      </div>
+
+      <div class="flex justify-center">
+        <div class="glass-card p-4 rounded-3xl gradient-border max-w-sm shadow-2xl">
+          <img src="app/src/main/res/drawable/app_preview_1785948141966.jpg" alt="Vista Previa de SUBE NFC Connect" class="rounded-2xl w-full object-cover shadow-lg" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Deployment & GitHub Sync Footer -->
+  <footer class="py-12 border-t border-white/10 text-center text-xs text-gray-500">
+    <div class="max-w-7xl mx-auto px-4 space-y-4">
+      <div class="flex items-center justify-center space-x-2">
+        <i class="fa-solid fa-cloud text-subeBlue"></i>
+        <span>Listo para desplegar en <strong>Cloudflare Pages</strong> / GitHub Actions</span>
+      </div>
+      <p>© 2026 SUBE NFC Connect - Código abierto disponible en GitHub</p>
+    </div>
+  </footer>
+
+</body>
+</html>
