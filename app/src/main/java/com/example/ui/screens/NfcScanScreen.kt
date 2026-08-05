@@ -50,6 +50,7 @@ import com.example.data.TransitCard
 import com.example.nfc.NfcMode
 import com.example.nfc.NfcScanResult
 import com.example.ui.components.NfcPulseAnimation
+import com.example.ui.components.NfcScanAnimationVisual
 import com.example.ui.theme.SubeBluePrimary
 import com.example.ui.theme.SubeCyanAccent
 import com.example.ui.theme.SubeMintSuccess
@@ -104,17 +105,10 @@ fun NfcScanScreen(
 
         // Animated NFC Sensor Core
         item {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 12.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                NfcPulseAnimation(
-                    isScanning = isScanning,
-                    size = 120.dp
-                )
-            }
+            NfcScanAnimationVisual(
+                isScanning = isScanning,
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
         }
 
         // Tap Action Button

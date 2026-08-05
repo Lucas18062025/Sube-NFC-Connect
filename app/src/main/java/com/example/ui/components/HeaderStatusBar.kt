@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.PhoneAndroid
@@ -180,50 +181,79 @@ fun HeaderStatusBar(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Bottom Status Pill: NFC Protocol Status & J7 Performance Mode Toggle
+            // Bottom Status Pill: NFC Protocol Status & Biometric Protection & J7 Toggle
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Hardware Status Chip
-                Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = when (nfcMode) {
-                        NfcMode.HARDWARE_NFC -> SubeMintSuccess.copy(alpha = 0.15f)
-                        NfcMode.LEGACY_J7_BRIDGE -> SubeCyanAccent.copy(alpha = 0.15f)
-                        NfcMode.SIMULATED_TESTER -> MaterialTheme.colorScheme.surfaceVariant
-                    }
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    // Hardware Status Chip
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        color = when (nfcMode) {
+                            NfcMode.HARDWARE_NFC -> SubeMintSuccess.copy(alpha = 0.15f)
+                            NfcMode.LEGACY_J7_BRIDGE -> SubeCyanAccent.copy(alpha = 0.15f)
+                            NfcMode.SIMULATED_TESTER -> MaterialTheme.colorScheme.surfaceVariant
+                        }
                     ) {
-                        Icon(
-                            imageVector = when (nfcMode) {
-                                NfcMode.HARDWARE_NFC -> Icons.Default.FlashOn
-                                NfcMode.LEGACY_J7_BRIDGE -> Icons.Default.PhoneAndroid
-                                NfcMode.SIMULATED_TESTER -> Icons.Default.Speed
-                            },
-                            contentDescription = "Status Icon",
-                            tint = when (nfcMode) {
-                                NfcMode.HARDWARE_NFC -> SubeMintSuccess
-                                NfcMode.LEGACY_J7_BRIDGE -> SubeBluePrimary
-                                NfcMode.SIMULATED_TESTER -> MaterialTheme.colorScheme.primary
-                            },
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = when (nfcMode) {
-                                NfcMode.HARDWARE_NFC -> "NFC Nativo Activo"
-                                NfcMode.LEGACY_J7_BRIDGE -> "Puente J7 / Soft-NFC Activo"
-                                NfcMode.SIMULATED_TESTER -> "Simulador ISO-7816"
-                            },
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                        Row(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = when (nfcMode) {
+                                    NfcMode.HARDWARE_NFC -> Icons.Default.FlashOn
+                                    NfcMode.LEGACY_J7_BRIDGE -> Icons.Default.PhoneAndroid
+                                    NfcMode.SIMULATED_TESTER -> Icons.Default.Speed
+                                },
+                                contentDescription = "Status Icon",
+                                tint = when (nfcMode) {
+                                    NfcMode.HARDWARE_NFC -> SubeMintSuccess
+                                    NfcMode.LEGACY_J7_BRIDGE -> SubeBluePrimary
+                                    NfcMode.SIMULATED_TESTER -> MaterialTheme.colorScheme.primary
+                                },
+                                modifier = Modifier.size(14.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = when (nfcMode) {
+                                    NfcMode.HARDWARE_NFC -> "NFC Nativo"
+                                    NfcMode.LEGACY_J7_BRIDGE -> "Puente J7"
+                                    NfcMode.SIMULATED_TESTER -> "Simulador"
+                                },
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    // Biometric Security Active Badge
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        color = SubeMintSuccess.copy(alpha = 0.15f)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Fingerprint,
+                                contentDescription = "Biometría Activa",
+                                tint = SubeMintSuccess,
+                                modifier = Modifier.size(14.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "Biometría OK",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = SubeMintSuccess
+                            )
+                        }
                     }
                 }
 

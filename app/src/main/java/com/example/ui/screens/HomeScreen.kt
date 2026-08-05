@@ -452,7 +452,8 @@ fun TransitShortcutChip(
 @Composable
 fun TransactionRowItem(
     transaction: Transaction,
-    currencyFormat: NumberFormat
+    currencyFormat: NumberFormat,
+    isMasked: Boolean = false
 ) {
     val dateFormat = SimpleDateFormat("dd MMM, HH:mm", Locale("es", "AR"))
     val dateStr = dateFormat.format(Date(transaction.timestamp))
@@ -501,13 +502,13 @@ fun TransactionRowItem(
 
                 Column {
                     Text(
-                        text = transaction.serviceName,
+                        text = if (isMasked) "Movimiento Oculto (Biométrico)" else transaction.serviceName,
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "$dateStr • ${transaction.locationOrBranch}",
+                        text = if (isMasked) "$dateStr • Ubicación Protegida" else "$dateStr • ${transaction.locationOrBranch}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -516,7 +517,7 @@ fun TransactionRowItem(
 
             Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = "${if (transaction.type.isDeduction) "-" else "+"}${currencyFormat.format(transaction.amount)}",
+                    text = if (isMasked) "${if (transaction.type.isDeduction) "-" else "+"} $ ••••••" else "${if (transaction.type.isDeduction) "-" else "+"}${currencyFormat.format(transaction.amount)}",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = if (transaction.type.isDeduction) MaterialTheme.colorScheme.onSurface else SubeMintSuccess

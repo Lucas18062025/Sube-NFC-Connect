@@ -47,6 +47,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.data.CardType
 import com.example.ui.components.AddCardDialog
 import com.example.ui.components.HeaderStatusBar
+import androidx.fragment.app.FragmentActivity
+import com.example.ui.components.BiometricAuthDialog
 import com.example.ui.components.UpdateBalanceDialog
 import com.example.ui.screens.DeviceDiagnosticScreen
 import com.example.ui.screens.HistoryScreen
@@ -68,7 +70,7 @@ sealed class NavDestination(val routeIndex: Int, val title: String, val icon: Im
     object Diagnostic : NavDestination(5, "Diag. J7", Icons.Default.Build)
 }
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
 
     private val viewModel: SubeViewModel by viewModels()
 

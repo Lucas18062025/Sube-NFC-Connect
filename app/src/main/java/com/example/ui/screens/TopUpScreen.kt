@@ -21,9 +21,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.filled.QrCode
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -50,6 +52,7 @@ import com.example.data.PaymentChannel
 import com.example.data.TopUpOrder
 import com.example.data.TopUpStatus
 import com.example.data.TransitCard
+import com.example.ui.components.BiometricAuthDialog
 import com.example.ui.theme.SubeBluePrimary
 import com.example.ui.theme.SubeMintSuccess
 import java.text.NumberFormat
@@ -72,7 +75,22 @@ fun TopUpScreen(
     var isCustom by remember { mutableStateOf(false) }
     var selectedChannel by remember { mutableStateOf(PaymentChannel.MERCADO_PAGO) }
 
+    var showBiometricAuth by remember { mutableStateOf(false) }
+    var pendingTopUpAmount by remember { mutableDoubleStateOf(0.0) }
+
     val presetAmounts = listOf(1000.0, 2000.0, 3000.0, 5000.0)
+
+    if (showBiometricAuth) {
+        BiometricAuthDialog(
+            actionTitle = "Autorizar Carga de Saldo",
+            actionDescription = "Confirmá con tu huella digital para procesar el pago de ${currencyFormat.format(pendingTopUpAmount)}.",
+            onDismiss = { showBiometricAuth = false },
+            onAuthenticated = {
+                showBiometricAuth = false
+                onGenerateTopUp(pendingTopUpAmount, selectedChannel)
+            }
+        )
+    }
 
     LazyColumn(
         modifier = modifier
@@ -271,7 +289,8 @@ fun TopUpScreen(
                     else
                         selectedAmount
 
-                    onGenerateTopUp(finalAmt, selectedChannel)
+                    pendingTopUpAmount = finalAmt
+                    showBiometricAuth = true
                 },
                 modifier = Modifier
                     .fillMaxWidth()
