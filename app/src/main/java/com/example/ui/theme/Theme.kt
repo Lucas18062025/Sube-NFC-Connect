@@ -11,6 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
+enum class ThemeMode(val displayName: String, val badgeText: String) {
+    SYSTEM("Sistema", "Auto"),
+    LIGHT("Modo Claro", "Día"),
+    DARK("Modo Oscuro", "Noche"),
+    OLED_BLACK("Modo OLED Negro", "Ahorro Batería")
+}
+
 private val DarkColorScheme = darkColorScheme(
     primary = SubeCyanAccent,
     onPrimary = Color.Black,
@@ -23,6 +30,23 @@ private val DarkColorScheme = darkColorScheme(
     surface = SlateDarkSurface,
     onSurface = TextPrimaryDark,
     surfaceVariant = SlateDarkCard,
+    onSurfaceVariant = TextSecondaryDark,
+    error = DangerRed,
+    onError = Color.White
+)
+
+private val OledColorScheme = darkColorScheme(
+    primary = SubeCyanAccent,
+    onPrimary = Color.Black,
+    primaryContainer = SubeBluePrimary,
+    onPrimaryContainer = Color.White,
+    secondary = SubeMintSuccess,
+    onSecondary = Color.Black,
+    background = OledDarkBackground,
+    onBackground = TextPrimaryDark,
+    surface = OledDarkSurface,
+    onSurface = TextPrimaryDark,
+    surfaceVariant = OledDarkCard,
     onSurfaceVariant = TextSecondaryDark,
     error = DangerRed,
     onError = Color.White
@@ -47,6 +71,7 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun MyApplicationTheme(
+    themeMode: ThemeMode = ThemeMode.SYSTEM,
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false, // Set false to preserve SUBE branded colors consistently
     content: @Composable () -> Unit
@@ -56,7 +81,10 @@ fun MyApplicationTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        darkTheme -> DarkColorScheme
+        themeMode == ThemeMode.OLED_BLACK -> OledColorScheme
+        themeMode == ThemeMode.DARK -> DarkColorScheme
+        themeMode == ThemeMode.LIGHT -> LightColorScheme
+        themeMode == ThemeMode.SYSTEM && darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
 

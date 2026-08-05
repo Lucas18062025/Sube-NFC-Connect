@@ -12,6 +12,11 @@ val SlateDarkBackground = Color(0xFF0B132B)
 val SlateDarkSurface = Color(0xFF1C2541)
 val SlateDarkCard = Color(0xFF24305E)
 
+// OLED Black Colors (0% pixel power consumption on AMOLED screens)
+val OledDarkBackground = Color(0xFF000000)
+val OledDarkSurface = Color(0xFF0C101C)
+val OledDarkCard = Color(0xFF161E31)
+
 val LightBackground = Color(0xFFF6F8FA)
 val LightSurface = Color(0xFFFFFFFF)
 val LightCardBg = Color(0xFFEDF2F7)

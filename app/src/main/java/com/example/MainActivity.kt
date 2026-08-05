@@ -82,7 +82,8 @@ class MainActivity : FragmentActivity() {
         handleNfcIntent(intent)
 
         setContent {
-            MyApplicationTheme {
+            val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
+            MyApplicationTheme(themeMode = themeMode) {
                 MainAppContent(viewModel = viewModel)
             }
         }
@@ -122,6 +123,7 @@ fun MainAppContent(viewModel: SubeViewModel) {
     val nfcMode by viewModel.nfcBridgeManager.nfcMode.collectAsStateWithLifecycle()
     val isScanning by viewModel.nfcBridgeManager.isScanning.collectAsStateWithLifecycle()
     val legacyModeEnabled by viewModel.nfcBridgeManager.legacyModeEnabled.collectAsStateWithLifecycle()
+    val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
 
     var currentRouteIndex by remember { mutableIntStateOf(0) }
     var showAddCardDialog by remember { mutableStateOf(false) }
@@ -150,6 +152,8 @@ fun MainAppContent(viewModel: SubeViewModel) {
                 nfcMode = nfcMode,
                 isLegacyModeEnabled = legacyModeEnabled,
                 onToggleLegacyMode = { viewModel.toggleLegacyMode(it) },
+                themeMode = themeMode,
+                onSelectThemeMode = { viewModel.setThemeMode(it) },
                 onOpenDiagnostic = { currentRouteIndex = 5 }
             )
         },
@@ -238,7 +242,9 @@ fun MainAppContent(viewModel: SubeViewModel) {
                     isHardwareNfcAvailable = viewModel.nfcBridgeManager.isHardwareNfcAvailable(),
                     isHardwareNfcEnabled = viewModel.nfcBridgeManager.isHardwareNfcEnabled(),
                     isLegacyModeEnabled = legacyModeEnabled,
-                    onToggleLegacyMode = { viewModel.toggleLegacyMode(it) }
+                    onToggleLegacyMode = { viewModel.toggleLegacyMode(it) },
+                    themeMode = themeMode,
+                    onSelectThemeMode = { viewModel.setThemeMode(it) }
                 )
             }
         }

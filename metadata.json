@@ -1,6 +1,6 @@
 {
   "name": "SUBE NFC Connect",
-  "description": "Adaptación del protocolo NFC para teléfonos antiguos y compatibles. Cargar saldo, consultar saldo, pagos sin contacto e historial de transacciones.",
+  "description": "Aplicación nativa para consulta, acreditación de cargas, transferencia e historial de tarjetas SUBE. Incluye gráfico de gastos interactivo, adaptador para teléfonos antiguos (Puente J7) y modo ahorro de batería OLED Negro.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

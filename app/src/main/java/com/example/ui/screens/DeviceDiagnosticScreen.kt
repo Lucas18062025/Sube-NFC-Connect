@@ -21,7 +21,10 @@ import androidx.compose.material.icons.filled.BatterySaver
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.FlashOn
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Memory
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Warning
@@ -30,6 +33,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -46,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import com.example.nfc.NfcMode
 import com.example.ui.theme.SubeBluePrimary
 import com.example.ui.theme.SubeMintSuccess
+import com.example.ui.theme.ThemeMode
 
 @Composable
 fun DeviceDiagnosticScreen(
@@ -54,6 +60,8 @@ fun DeviceDiagnosticScreen(
     isHardwareNfcEnabled: Boolean,
     isLegacyModeEnabled: Boolean,
     onToggleLegacyMode: (Boolean) -> Unit,
+    themeMode: ThemeMode = ThemeMode.OLED_BLACK,
+    onSelectThemeMode: (ThemeMode) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -175,6 +183,123 @@ fun DeviceDiagnosticScreen(
                             fontWeight = FontWeight.Bold,
                             color = SubeMintSuccess
                         )
+                    }
+                }
+            }
+        }
+
+        // Dynamic Material 3 Theme & OLED Battery Saving Card
+        item {
+            Card(
+                shape = RoundedCornerShape(18.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(18.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .background(SubeMintSuccess.copy(alpha = 0.15f), CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.BatterySaver,
+                                    contentDescription = null,
+                                    tint = SubeMintSuccess,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Column {
+                                Text(
+                                    text = "Tema Dinámico & Ahorro OLED",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = "Apaga píxeles en pantallas AMOLED para ahorrar energía",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    // Theme Mode Selector Chips
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ThemeMode.values().forEach { mode ->
+                            val isSelected = themeMode == mode
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = if (isSelected) SubeBluePrimary.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant,
+                                border = if (isSelected) androidx.compose.foundation.BorderStroke(1.5.dp, SubeBluePrimary) else null,
+                                onClick = { onSelectThemeMode(mode) },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 14.dp, vertical = 10.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = when (mode) {
+                                                ThemeMode.OLED_BLACK -> Icons.Default.BatterySaver
+                                                ThemeMode.DARK -> Icons.Default.DarkMode
+                                                ThemeMode.LIGHT -> Icons.Default.LightMode
+                                                ThemeMode.SYSTEM -> Icons.Default.Palette
+                                            },
+                                            contentDescription = null,
+                                            tint = if (isSelected) SubeBluePrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(10.dp))
+                                        Column {
+                                            Text(
+                                                text = mode.displayName,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                                color = MaterialTheme.colorScheme.onSurface
+                                            )
+                                            Text(
+                                                text = when (mode) {
+                                                    ThemeMode.OLED_BLACK -> "Fondo #000000. Píxeles apagados (Consumo ~0%)"
+                                                    ThemeMode.DARK -> "Fondo azul marino oscuro confort de noche"
+                                                    ThemeMode.LIGHT -> "Fondo claro estándar para luz de día"
+                                                    ThemeMode.SYSTEM -> "Auto-sincronizado con ajuste de Android"
+                                                },
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+
+                                    Surface(
+                                        shape = RoundedCornerShape(10.dp),
+                                        color = if (mode == ThemeMode.OLED_BLACK) SubeMintSuccess.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surface
+                                    ) {
+                                        Text(
+                                            text = mode.badgeText,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (mode == ThemeMode.OLED_BLACK) SubeMintSuccess else MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

@@ -1,17 +1,47 @@
 # 💳 SUBE NFC Connect
 
-Aplicación nativa para Android diseñada para la gestión integral de tarjetas de transporte público SUBE (Argentina).
+Aplicación nativa para Android diseñada para la lectura, consulta, acreditación de cargas y análisis de tarjetas de transporte público **SUBE** (Argentina).
+
+---
+
+## 📱 Vista Previa de la Aplicación (App Preview)
+
+<p align="center">
+  <img src="app/src/main/res/drawable/app_preview_1785948141966.jpg" alt="Vista previa de SUBE NFC Connect" width="340"/>
+</p>
+
+---
 
 ## 🚀 Características Principales
-* **Lectura NFC Directa:** Lectura y decodificación de chips NFC/Mifare ISO 14443.
-* **Sincronización Manual:** Compatibilidad con dispositivos sin lector NFC (modo emulador o móviles J-Series / gama entrada).
-* **Persistencia Offline-First:** Almacenamiento local mediante **Room Database**.
-* **Historial & Transacciones:** Registro interactivo de viajes en colectivo, tren y subte.
-* **Diagnóstico de Hardware:** Panel de estado del sensor NFC y compatibilidad del dispositivo.
 
-## 🏗️ Arquitectura y Tecnologías
-* **Lenguaje:** Kotlin 100%
-* **Interfaz de Usuario:** Jetpack Compose + Material Design 3
-* **Patrón de Diseño:** MVVM (Model-View-ViewModel) + Clean Architecture
-* **Base de Datos:** Room DB con KSP
-* **Asincronía:** Kotlin Coroutines & Flow
+- 📡 **Escáner y Visualizador NFC de Alta Tecnología**:
+  - Componente animado interactivo `NfcScanAnimationVisual` en Jetpack Compose.
+  - Simulación de campo de radiofrecuencia (RF), barrido de radar en tiempo real y flujo de estado APDU (ISO 14443-A).
+  - Animación de tarjeta aproxima / tap dinámico sobre la antena NFC.
+
+- 📊 **Gráfico de Consumo Mensual (Jetpack Compose Nativo)**:
+  - Visualización interactiva mediante gráfico de líneas suaves y relleno de área `MonthlySpendingChart`.
+  - Comparativa visual entre **Gastos en viajes** y **Cargas acreditadas** de los últimos 6 meses.
+  - Selección táctil interactiva de meses y cálculo de ahorros con tarifa RED SUBE.
+
+- 🔋 **Tema Dinámico Material 3 & Modo OLED Negro**:
+  - **Modo OLED Negro (Ahorro Batería)**: Fondo `#000000` con píxeles completamente apagados para reducir el consumo en pantallas AMOLED/OLED.
+  - Alternador dinámico accesible desde el menú superior entre modos **OLED**, **Oscuro**, **Claro** y **Sistema**.
+
+- 📱 **Soporte Adaptador Puente / Modo Ligero (J7 & Teléfonos Antiguos)**:
+  - Compatibilidad completa con hardware NFC nativo y modo emulador/puente para dispositivos con sensores de baja potencia.
+
+- 🔒 **Seguridad y Persistencia Local**:
+  - Almacenamiento seguro fuera de línea mediante **Room Database**.
+  - Ocultación de saldos y autenticación biométrica (Huella Digital / PIN) para proteger el historial de transacciones.
+
+---
+
+## 🛠️ Tecnologías Utilizadas
+
+- **Lenguaje**: Kotlin
+- **UI Framework**: Jetpack Compose + Material Design 3
+- **Arquitectura**: Clean Architecture / MVVM con ViewModel y StateFlow
+- **Base de Datos**: Room Database
+- **NFC**: Android NFC Adapter APIs + ISO 14443 APDU Handler Bridge
+- **Gráficos y Animaciones**: Compose Canvas Drawing, Vector Paths, InfiniteTransition

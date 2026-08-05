@@ -13,6 +13,7 @@ import com.example.data.TransactionType
 import com.example.data.TransitCard
 import com.example.nfc.NfcBridgeManager
 import com.example.nfc.NfcScanResult
+import com.example.ui.theme.ThemeMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -65,6 +66,24 @@ class SubeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _scanResult = MutableStateFlow<NfcScanResult?>(null)
     val scanResult: StateFlow<NfcScanResult?> = _scanResult.asStateFlow()
+
+    private val _themeMode = MutableStateFlow(ThemeMode.OLED_BLACK)
+    val themeMode: StateFlow<ThemeMode> = _themeMode.asStateFlow()
+
+    fun setThemeMode(mode: ThemeMode) {
+        _themeMode.value = mode
+        _uiMessage.value = "Tema actualizado: ${mode.displayName}"
+    }
+
+    fun cycleThemeMode() {
+        val nextMode = when (_themeMode.value) {
+            ThemeMode.OLED_BLACK -> ThemeMode.DARK
+            ThemeMode.DARK -> ThemeMode.LIGHT
+            ThemeMode.LIGHT -> ThemeMode.SYSTEM
+            ThemeMode.SYSTEM -> ThemeMode.OLED_BLACK
+        }
+        setThemeMode(nextMode)
+    }
 
     init {
         viewModelScope.launch {

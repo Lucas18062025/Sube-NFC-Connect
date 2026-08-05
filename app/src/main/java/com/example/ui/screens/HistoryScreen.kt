@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import com.example.data.Transaction
 import com.example.data.TransactionType
 import com.example.ui.components.BiometricAuthDialog
+import com.example.ui.components.MonthlySpendingChart
 import com.example.ui.theme.SubeBluePrimary
 import com.example.ui.theme.SubeMintSuccess
 import java.text.NumberFormat
@@ -216,7 +217,7 @@ fun HistoryScreen(
                     Column {
                         Text("TOTAL VIAJADO MES", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(
-                            currencyFormat.format(totalSpent),
+                            if (isHistoryUnlocked) currencyFormat.format(totalSpent) else "$ ••••••",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
@@ -237,7 +238,7 @@ fun HistoryScreen(
                             Text("Ahorro RED SUBE", style = MaterialTheme.typography.labelSmall, color = SubeMintSuccess, fontWeight = FontWeight.Bold)
                         }
                         Text(
-                            currencyFormat.format(totalSpent * 0.35),
+                            if (isHistoryUnlocked) currencyFormat.format(totalSpent * 0.35) else "$ ••••••",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = SubeMintSuccess
@@ -245,6 +246,14 @@ fun HistoryScreen(
                     }
                 }
             }
+        }
+
+        // Native Line Chart for Monthly Spending Pattern
+        item {
+            MonthlySpendingChart(
+                transactions = transactions,
+                isMasked = !isHistoryUnlocked
+            )
         }
 
         // Search Input

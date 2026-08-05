@@ -14,11 +14,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BatterySaver
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.FlashOn
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Nfc
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material3.DropdownMenu
@@ -46,6 +50,7 @@ import com.example.nfc.NfcMode
 import com.example.ui.theme.SubeBluePrimary
 import com.example.ui.theme.SubeCyanAccent
 import com.example.ui.theme.SubeMintSuccess
+import com.example.ui.theme.ThemeMode
 
 @Composable
 fun HeaderStatusBar(
@@ -55,10 +60,13 @@ fun HeaderStatusBar(
     nfcMode: NfcMode,
     isLegacyModeEnabled: Boolean,
     onToggleLegacyMode: (Boolean) -> Unit,
+    themeMode: ThemeMode = ThemeMode.OLED_BLACK,
+    onSelectThemeMode: (ThemeMode) -> Unit = {},
     onOpenDiagnostic: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var cardDropdownExpanded by remember { mutableStateOf(false) }
+    var themeDropdownExpanded by remember { mutableStateOf(false) }
 
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -164,6 +172,63 @@ fun HeaderStatusBar(
                     }
 
                     Spacer(modifier = Modifier.width(6.dp))
+
+                    // Theme Selector Dropdown
+                    Box {
+                        IconButton(
+                            onClick = { themeDropdownExpanded = true },
+                            modifier = Modifier.testTag("btn_theme_selector")
+                        ) {
+                            Icon(
+                                imageVector = when (themeMode) {
+                                    ThemeMode.OLED_BLACK -> Icons.Default.BatterySaver
+                                    ThemeMode.DARK -> Icons.Default.DarkMode
+                                    ThemeMode.LIGHT -> Icons.Default.LightMode
+                                    ThemeMode.SYSTEM -> Icons.Default.Palette
+                                },
+                                contentDescription = "Cambiar Tema / Ahorro OLED",
+                                tint = if (themeMode == ThemeMode.OLED_BLACK) SubeMintSuccess else MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = themeDropdownExpanded,
+                            onDismissRequest = { themeDropdownExpanded = false }
+                        ) {
+                            ThemeMode.values().forEach { mode ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Column {
+                                            Text(mode.displayName, fontWeight = FontWeight.Bold)
+                                            Text(
+                                                mode.badgeText,
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = if (mode == ThemeMode.OLED_BLACK) SubeMintSuccess else MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    },
+                                    onClick = {
+                                        onSelectThemeMode(mode)
+                                        themeDropdownExpanded = false
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = when (mode) {
+                                                ThemeMode.OLED_BLACK -> Icons.Default.BatterySaver
+                                                ThemeMode.DARK -> Icons.Default.DarkMode
+                                                ThemeMode.LIGHT -> Icons.Default.LightMode
+                                                ThemeMode.SYSTEM -> Icons.Default.Palette
+                                            },
+                                            contentDescription = null,
+                                            tint = if (mode == themeMode) SubeMintSuccess else MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(2.dp))
 
                     // Hardware Audit Diagnostic Button
                     IconButton(
