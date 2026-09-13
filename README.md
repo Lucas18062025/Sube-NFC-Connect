@@ -1,6 +1,14 @@
 # 💳 SUBE NFC Connect
 
+![Kotlin](https://img.shields.io/badge/Kotlin-2.x-7F52FF?style=flat-square&logo=kotlin)
+![Compose](https://img.shields.io/badge/Jetpack_Compose-Material3-4285F4?style=flat-square&logo=jetpackcompose)
+![Room](https://img.shields.io/badge/Room-offline-669933?style=flat-square&logo=sqlite)
+![License](https://img.shields.io/badge/License-Apache_2.0-green?style=flat-square)
+[![Live Demo](https://img.shields.io/badge/Demo-Live-8b5cf6?style=flat-square)](https://sube-nfc-connect.lucaslean1806.workers.dev/)
+
 Aplicación nativa para Android diseñada para la lectura, consulta, acreditación de cargas y análisis de tarjetas de transporte público **SUBE** (Argentina).
+
+**🌐 Landing demo:** https://sube-nfc-connect.lucaslean1806.workers.dev/ (`index.html` en la raíz, Tailwind vía CDN).
 
 ---
 
@@ -45,3 +53,22 @@ Aplicación nativa para Android diseñada para la lectura, consulta, acreditaci�
 - **Base de Datos**: Room Database
 - **NFC**: Android NFC Adapter APIs + ISO 14443 APDU Handler Bridge
 - **Gráficos y Animaciones**: Compose Canvas Drawing, Vector Paths, InfiniteTransition
+
+---
+
+## 🔨 Compilar
+
+```bash
+# Requiere Android Studio (Hedgehog+) con SDK 34
+# 1. Abrir la carpeta del repo en Android Studio
+# 2. Sync Gradle + Run en dispositivo con NFC
+```
+
+> El repo no incluye `gradlew` (wrapper): generarlo con
+> `gradle wrapper` si compilás por CLI. `local.properties` (SDK path,
+> firmas) nunca se commitea — ver `.gitignore`.
+
+## 📦 Release
+
+- Generar APK firmado desde *Build → Generate Signed Bundle/APK*.
+- Adjuntar el APK como GitHub Release con screenshots y changelog.
